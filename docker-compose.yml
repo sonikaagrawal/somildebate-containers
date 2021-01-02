@@ -1,0 +1,44 @@
+version: '3'
+services:
+  web:
+    container_name: web
+    ## build:
+    ##  context: .
+    ##  dockerfile: Dockerfile.webserver
+    image: nginx:1.17.10
+    volumes: 
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    restart: unless-stopped
+    depends_on: 
+      - app
+    networks: 
+      - somildebate
+    ports:
+      - 80:80
+  app:
+    container_name: app
+    build: .
+    restart: unless-stopped
+    command: npm start
+    networks: 
+      - somildebate
+    depends_on: 
+      - database
+    ports: 
+      - 3000:3000
+  database:
+    container_name: database
+    command: --default-authentication-plugin=mysql_native_password
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: password
+     ## MYSQL_USER: somildebate
+     ## MYSQL_PASSWORD: user123!
+    ports: 
+      - 3306:3306
+    networks: 
+      - somildebate
+networks: 
+  somildebate:
